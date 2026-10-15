@@ -64,7 +64,6 @@ body{background:radial-gradient(ellipse at 12% 0%,#252b39 0,transparent 35%),var
 @media(max-width:760px){.random-video-layout{grid-template-columns:1fr}.random-video-frame{max-width:360px;margin:0 auto;width:100%}.random-video-info{align-items:stretch}}
 </style>
 
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 
 <style>
 .leaderboard-table th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px}
@@ -318,37 +317,7 @@ document.getElementById('randomMemeCaption').onclick=()=>{
  document.getElementById('randomMemeResult').textContent=extraCaptions[Math.floor(Math.random()*extraCaptions.length)];
 };
 
-// Video lounge: try official embed formats, with a new-tab fallback.
-function showVideo(raw){
- const url=(raw||'').trim(); if(!url){document.getElementById('videoStatus').textContent='Bitte zuerst einen Video-Link einfügen.';return;}
- let parsed; try{parsed=new URL(url)}catch(e){document.getElementById('videoStatus').textContent='Das sieht nicht nach einem gültigen Link aus.';return;}
- if(!['https:','http:'].includes(parsed.protocol)){document.getElementById('videoStatus').textContent='Bitte einen http- oder https-Link verwenden.';return;}
- const host=parsed.hostname.toLowerCase().replace(/^www\./,'');
- let embed='',label='Video',ratio='video-frame';
- if(host==='youtu.be'||host.endsWith('youtube.com')){
-   let id=host==='youtu.be'?parsed.pathname.split('/').filter(Boolean)[0]:(parsed.searchParams.get('v')||(parsed.pathname.match(/\/(?:shorts|embed)\/([^/?]+)/)||[])[1]);
-   if(id){embed='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id);label='YouTube';ratio+=' video-wide';}
-   else {document.getElementById('videoStatus').textContent='Das ist eine YouTube-Seite, aber kein konkreter Video-Link. Öffne ein Video und kopiere dessen URL.';window.open(url,'_blank','noopener');return;}
- } else if(host==='tiktok.com'||host.endsWith('.tiktok.com')){
-   const match=parsed.pathname.match(/\/video\/(\d+)/);
-   if(match){embed='https://www.tiktok.com/player/v1/'+match[1]+'?music_info=1&description=1';label='TikTok';}
- } else if(host==='instagram.com'||host.endsWith('.instagram.com')){
-   const match=parsed.pathname.match(/\/(reel|reels|p|tv)\/([^/]+)/);
-   if(match){embed='https://www.instagram.com/'+match[1]+'/'+match[2]+'/embed';label='Instagram';}
- } else if(host==='vimeo.com'||host.endsWith('.vimeo.com')){
-   const match=parsed.pathname.match(/\/(\d+)/);
-   if(match){embed='https://player.vimeo.com/video/'+match[1];label='Vimeo';ratio+=' video-wide';}
- }
- document.getElementById('videoShell').hidden=false;
- document.getElementById('videoExternal').href=url;
- document.getElementById('videoPlatform').textContent=label;
- const frame=document.getElementById('videoFrame'); frame.className=ratio;
- if(embed){frame.src=embed;document.getElementById('videoStatus').textContent='Player geladen – falls er leer bleibt, nutze „In neuem Tab öffnen“. Die Plattform kann das Einbetten blockieren.';}
- else {frame.removeAttribute('src');document.getElementById('videoStatus').textContent='Für diesen Link gibt es hier keinen passenden eingebetteten Player. Du kannst ihn in einem neuen Tab öffnen.';window.open(url,'_blank','noopener');}
-}
-document.getElementById('loadVideo').onclick=()=>showVideo(document.getElementById('videoUrl').value);
-document.getElementById('videoUrl').addEventListener('keydown',e=>{if(e.key==='Enter')showVideo(e.target.value)});
-document.querySelectorAll('.videoQuick').forEach(b=>b.onclick=()=>{document.getElementById('videoUrl').value=b.dataset.url;window.open(b.dataset.url,'_blank','noopener');});
+// Video lounge logic is initialized in the current random-feed module below.
 
 // Local pass-and-play quiz duel.
 const duelQs=[
@@ -398,10 +367,10 @@ document.getElementById('captionVoteTwo').onclick=()=>{dqScores[1]++;document.ge
 // ---------------- Random video feed with a verified fallback path ----------------
 (()=>{
  const videos=[
-  {id:'-yUSPEGcOQE',title:'POV: ID-Karte vergessen',tag:'Office Comedy',desc:'Ein kurzer Büro-Alltagsclip.'},
-  {id:'mSMIXwdcY9k',title:'Office-Pranks mit Dwight',tag:'Office Comedy',desc:'Ein Comedy-Clip aus The Office.'},
-  {id:'cw3tw4_vuy0',title:'Toxic Office WFH Policy',tag:'Workplace Comedy',desc:'Ein Sketch über Meetings und Büroalltag.'},
-  {id:'fLPzbQ2NT-Q',title:'Corporate-Life-Short',tag:'Comedy Short',desc:'Ein kurzer Clip über Arbeitsalltag.'}
+  {id:'yE6vQ6YkWGA',title:'The Office (UK) – Best Moments',tag:'Office Comedy',desc:'Comedy-Highlights vom offiziellen The Office-Kanal.'},
+  {id:'eac0S42WpYg',title:'Funniest Meetings – The Office',tag:'Meeting-Memes',desc:'Büro-Meetings, die viel zu lang dauern.'},
+  {id:'uPeV5NvaAfI',title:'Dwight als Acting Manager',tag:'Office Comedy',desc:'Ein offizieller Clip aus The Office US.'},
+  {id:'fLPzbQ2NT-Q',title:'Why is he like this?',tag:'Comedy Short',desc:'Ein kurzer Corporate-Life-Short.'}
  ];
  let current=-1,auto=false,autoTimer=null,loadTimer=null;
  const frame=document.getElementById('randomVideoFrame'),status=document.getElementById('videoLoadStatus');
@@ -509,7 +478,25 @@ document.getElementById('captionVoteTwo').onclick=()=>{dqScores[1]++;document.ge
 })();
 
 // ---------------- PeerJS room-based live multiplayer: Neon Arena ----------------
+function ensurePeerLibrary(){
+ return new Promise((resolve,reject)=>{
+  if(typeof Peer!=='undefined'){resolve();return}
+  let script=document.getElementById('peerjs-lazy-script');
+  if(script){
+   if(script.dataset.failed==='1'){reject(new Error('PeerJS konnte nicht geladen werden'));return}
+   script.addEventListener('load',()=>typeof Peer!=='undefined'?resolve():reject(new Error('PeerJS ist nicht verfügbar')),{once:true});
+   script.addEventListener('error',()=>reject(new Error('PeerJS-CDN nicht erreichbar')),{once:true});
+   return;
+  }
+  script=document.createElement('script');script.id='peerjs-lazy-script';script.src='https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';script.async=true;
+  const timeout=setTimeout(()=>{script.dataset.failed='1';reject(new Error('Zeitüberschreitung beim Laden von PeerJS'))},9000);
+  script.onload=()=>{clearTimeout(timeout);typeof Peer!=='undefined'?resolve():reject(new Error('PeerJS ist nicht verfügbar'))};
+  script.onerror=()=>{clearTimeout(timeout);script.dataset.failed='1';reject(new Error('PeerJS-CDN nicht erreichbar'))};
+  document.head.appendChild(script);
+ });
+}
 (()=>{
+
  const canvas=document.getElementById('multiCanvas'),ctx=canvas.getContext('2d');
  const status=document.getElementById('multiStatus'),msg=document.getElementById('multiMessage'),codePanel=document.getElementById('roomCodePanel'),codeDisplay=document.getElementById('roomCodeDisplay'),scoresEl=document.getElementById('multiScores');
  let peer=null,conn=null,isHost=false,roomCode='',players={},orbs=[],gameRunning=false,remaining=60,lastTick=0,hostTimer=null,orbTimer=null,playerId='',keys={},touch={x:0,y:0},lastState=null;const hostConnections=new Set();
@@ -581,16 +568,19 @@ document.getElementById('captionVoteTwo').onclick=()=>{dqScores[1]++;document.ge
   c.on('close',()=>{if(!isHost){setStatus('Verbindung getrennt');msg.textContent='Die Verbindung zum Host wurde getrennt.';}});
   c.on('error',()=>{setStatus('Verbindungsfehler');msg.textContent='Verbindung unterbrochen. Bitte erneut beitreten.';});
  }
- document.getElementById('createRoom').onclick=()=>{
+ document.getElementById('createRoom').onclick=async()=>{
   if(isHost&&peer){if(!gameRunning)startMatch();return}
+  setStatus('Multiplayer wird geladen …');msg.textContent='Die normalen Spiele funktionieren unabhängig davon. Einen Moment bitte …';
+  try{await ensurePeerLibrary()}catch(e){setStatus('Multiplayer nicht verfügbar');msg.textContent='PeerJS konnte nicht geladen werden. Prüfe Internet/Netzwerkfilter; die lokalen Spiele funktionieren trotzdem.';return}
   if(peer)peer.destroy();hostConnections.clear();document.getElementById('createRoom').textContent='Runde starten';setupHost();
  };
- document.getElementById('joinRoom').onclick=()=>{
+ document.getElementById('joinRoom').onclick=async()=>{
   const code=document.getElementById('roomCodeInput').value.trim().toUpperCase();
   if(!/^[A-Z0-9]{6}$/.test(code)){msg.textContent='Bitte einen sechsstelligen Raumcode eingeben.';return}
-  if(typeof Peer==='undefined'){setStatus('PeerJS nicht geladen');msg.textContent='Das Multiplayer-Modul konnte nicht geladen werden. Prüfe deine Internetverbindung oder den Netzwerkfilter.';return}
+  setStatus('Multiplayer wird geladen …');
+  try{await ensurePeerLibrary()}catch(e){setStatus('Multiplayer nicht verfügbar');msg.textContent='PeerJS konnte nicht geladen werden. Prüfe Internet/Netzwerkfilter; die lokalen Spiele funktionieren trotzdem.';return}
   clean();isHost=false;roomCode=code;codePanel.hidden=true;playerId='guest-pending';peer=new Peer();
-  peer.on('open',()=>{conn=peer.connect('azubihub-'+code.toLowerCase(),{reliable:true});conn.on('open',()=>{setStatus('Verbinde …');conn.send({type:'join',id:peer.id,name:localName()});});wireConnection(conn);});
+  peer.on('open',()=>{conn=peer.connect('azubihub-'+code.toLowerCase(),{reliable:true});wireConnection(conn);});
   peer.on('error',e=>{setStatus('Verbindung fehlgeschlagen');msg.textContent='Raum nicht erreichbar ('+(e.type||'Netzwerkfehler')+'). Prüfe den Code und ob der Host noch online ist.';});
  };
  document.getElementById('leaveRoom').onclick=()=>{clean();if(peer)peer.destroy();hostConnections.clear();peer=null;conn=null;isHost=false;roomCode='';playerId='';players={};orbs=[];codePanel.hidden=true;setStatus('Nicht verbunden');msg.textContent='Du hast den Raum verlassen.';draw();renderScores();document.getElementById('createRoom').textContent='Raum erstellen'};
