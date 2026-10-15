@@ -50,6 +50,20 @@ body{background:radial-gradient(ellipse at 12% 0%,#252b39 0,transparent 35%),var
 @media(max-width:760px){.arcade-grid{grid-template-columns:1fr}.arcade-stat{margin-left:0;width:100%}}
 </style>
 
+
+<style>
+.random-video-layout{display:grid;grid-template-columns:minmax(220px,340px) 1fr;gap:18px;align-items:center}
+.random-video-frame{width:100%;aspect-ratio:9/16;max-height:560px;background:#070810;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+.random-video-frame iframe{width:100%;height:100%;border:0}
+.random-video-info{display:flex;flex-direction:column;align-items:flex-start;gap:10px}.random-video-info h3{margin:0;font-size:24px}
+.memory-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.memory-card{aspect-ratio:1/1;border:1px solid var(--line);border-radius:12px;background:linear-gradient(145deg,#24243b,#12121f);color:var(--text);font-size:clamp(20px,3vw,34px);font-weight:900;cursor:pointer;transition:transform .12s,border-color .12s}
+.memory-card:hover{border-color:var(--lime);transform:translateY(-1px)}
+.memory-card.flipped,.memory-card.matched{background:#d9ff6517;border-color:var(--lime)}
+.memory-card.matched{cursor:default;opacity:.72}
+@media(max-width:760px){.random-video-layout{grid-template-columns:1fr}.random-video-frame{max-width:360px;margin:0 auto;width:100%}.random-video-info{align-items:stretch}}
+</style>
+
 </head>
 <body>
 <div class="wrap">
@@ -128,21 +142,21 @@ body{background:radial-gradient(ellipse at 12% 0%,#252b39 0,transparent 35%),var
   <div class="result" id="randomMemeResult"></div>
 </section>
 
-<div class="sectionhead" id="videos"><div><div class="eyebrow">06 / Video-Pause</div><h2>Reels, TikToks & Videos</h2><p>Link einfügen und schauen, ob die Plattform das Einbetten erlaubt.</p></div></div>
+
+<div class="sectionhead" id="videos"><div><div class="eyebrow">06 / Kurz mal weg</div><h2>Random Video Feed</h2><p>Kein Link nötig – die Seite wählt automatisch ein Video aus.</p></div></div>
 <section class="card">
-  <div class="head"><div class="iconbox">▶</div><div><h3>Video-Lounge</h3><p class="sub">YouTube, TikTok oder Instagram-Reels direkt hier versuchen.</p></div></div>
-  <div class="inputrow"><input id="videoUrl" type="url" placeholder="Video-Link einfügen …" aria-label="Video-Link"><button class="btn" id="loadVideo">Öffnen</button></div>
-  <div class="row" style="margin-top:10px">
-    <button class="btn alt videoQuick" data-url="https://www.youtube.com/">YouTube</button>
-    <button class="btn alt videoQuick" data-url="https://www.tiktok.com/">TikTok</button>
-    <button class="btn alt videoQuick" data-url="https://www.instagram.com/reels/">Instagram Reels</button>
+  <div class="head"><div class="iconbox">▶</div><div><h3>Pause-Feed</h3><p class="sub">Kurze Comedy- und Office-Clips. Klick auf „Nächstes Video“, wenn du weiter willst.</p></div></div>
+  <div class="random-video-layout">
+    <div class="random-video-frame"><iframe id="randomVideoFrame" title="Zufälliges Kurzvideo" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+    <div class="random-video-info">
+      <span class="pill" id="randomVideoTag">Zufälliger Clip</span>
+      <h3 id="randomVideoTitle">Video wird geladen …</h3>
+      <p class="sub" id="randomVideoDescription">Der Feed wählt automatisch einen Clip aus. YouTube kann Einbettungen je nach Video blockieren.</p>
+      <div class="row"><button class="btn" id="nextRandomVideo">Nächstes Video ↗</button><button class="btn alt" id="openRandomVideo">Auf YouTube öffnen</button></div>
+      <div class="row" style="margin-top:8px"><button class="btn alt" id="toggleAutoplay">Auto-Wechsel: Aus</button><button class="btn alt" id="randomVideoSearch">Mehr Shorts finden</button></div>
+    </div>
   </div>
-  <div id="videoStatus" class="notice" style="margin-top:12px">Füge einen konkreten Video-Link ein. Wenn der Player blockiert wird, kannst du das Video über „In neuem Tab öffnen“ starten.</div>
-  <div class="video-shell" id="videoShell" hidden>
-    <div class="row" style="justify-content:space-between;margin-bottom:10px"><span class="pill" id="videoPlatform">Video</span><a id="videoExternal" class="btn alt" href="#" target="_blank" rel="noopener noreferrer">In neuem Tab öffnen ↗</a></div>
-    <iframe id="videoFrame" class="video-frame" title="Eingebettetes Video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-  </div>
-  <p class="notice" style="margin-top:12px">Hinweis: Instagram und TikTok verhindern das Einbetten mancher Videos oder verlangen Login/Cookies. Das liegt an den Plattformen, nicht an der Seite. Auf manchen Arbeitsnetzwerken können Video-Seiten gesperrt sein.</p>
+  <p class="notice" style="margin-top:12px">Die Clips werden automatisch aus einer kleinen kuratierten Auswahl gezogen; ein echter, ständig aktueller Instagram-/TikTok-Feed benötigt eine offizielle API bzw. einen externen Dienst. Instagram und TikTok blockieren Einbettungen häufig. Für zuverlässiges Abspielen nutzen wir hier YouTube-Embeds.</p>
 </section>
 
 <div class="sectionhead" id="duelle"><div><div class="eyebrow">07 / Kleine Rivalität</div><h2>Duell-Modus</h2><p>Zu zweit oder in Teams am selben Gerät – Punkte zählen.</p></div></div>
@@ -175,21 +189,29 @@ body{background:radial-gradient(ellipse at 12% 0%,#252b39 0,transparent 35%),var
 <p class="notice" style="margin-top:12px">Wichtig: Diese Version speichert Punkte nur in der geöffneten Seite. Das sind lokale Mehrspieler-Spiele auf einem Gerät, noch keine Online-Lobby. Damit mehrere Azubis von verschiedenen Handys gleichzeitig gegeneinander spielen, braucht die Website zusätzlich einen gemeinsamen Server/Realtime-Dienst.</p>
 
 
-<div class="sectionhead" id="arcade"><div><div class="eyebrow">08 / Highscore statt Langeweile</div><h2>Arcade</h2><p>Zwei kleine Spiele direkt im Browser. Keine Installation, keine Anmeldung.</p></div></div>
+
+<div class="sectionhead" id="arcade"><div><div class="eyebrow">08 / Arcade</div><h2>Arcade Zone</h2><p>Drei überarbeitete Spiele mit stabiler Steuerung, Neustart und Bestwerten.</p></div></div>
 <section class="arcade-grid">
   <article class="arcade-card">
-    <div class="arcade-head"><div><h3>☕ Azubi Runner</h3><p>Spring über Kartons, sammle Kaffee und knack deinen Highscore.</p></div><span class="pill">2D</span></div>
-    <canvas id="runnerCanvas" class="arcade-canvas" width="800" height="500" aria-label="2D-Spiel Azubi Runner"></canvas>
-    <div class="arcade-controls"><button class="btn" id="runnerStart">Spiel starten</button><button class="btn alt" id="runnerPause">Pause</button><span class="arcade-stat">Score: <b id="runnerScore">0</b> · Best: <b id="runnerBest">0</b></span></div>
-    <div class="arcade-mobile"><button class="btn alt" id="runnerJump">Springen ↑</button><button class="btn alt" id="runnerDuck">Ducken ↓</button></div>
-    <p class="arcade-help">Steuerung: Leertaste / ↑ zum Springen, ↓ zum Ducken. Am Handy die Buttons verwenden. Kaffee gibt Bonuspunkte.</p>
+    <div class="arcade-head"><div><h3>🐍 Neon Snake</h3><p>Sammle Punkte, wachse und beiß dich nicht selbst.</p></div><span class="pill">2D · Klassiker</span></div>
+    <canvas id="snakeCanvas" class="arcade-canvas" width="640" height="448" aria-label="Neon Snake"></canvas>
+    <div class="arcade-controls"><button class="btn" id="snakeStart">Start / Neustart</button><button class="btn alt" id="snakePause">Pause</button><span class="arcade-stat">Punkte: <b id="snakeScore">0</b> · Best: <b id="snakeBest">0</b></span></div>
+    <div class="arcade-mobile"><button class="btn alt" id="snakeUp">↑</button></div><div class="arcade-mobile"><button class="btn alt" id="snakeLeft">←</button><button class="btn alt" id="snakeDown">↓</button><button class="btn alt" id="snakeRight">→</button></div>
+    <p class="arcade-help">Pfeiltasten oder WASD. Am Handy die Richtungstasten verwenden. Nach einem Crash kannst du direkt neu starten.</p>
   </article>
   <article class="arcade-card">
-    <div class="arcade-head"><div><h3>🛣️ Office Rush</h3><p>Weiche Hindernissen aus und überlebe den Büro-Parcours in 3D-Optik.</p></div><span class="pill">Pseudo-3D</span></div>
-    <canvas id="rushCanvas" class="arcade-canvas" width="800" height="500" aria-label="Pseudo-3D-Spiel Office Rush"></canvas>
-    <div class="arcade-controls"><button class="btn" id="rushStart">Spiel starten</button><button class="btn alt" id="rushPause">Pause</button><span class="arcade-stat">Score: <b id="rushScore">0</b> · Best: <b id="rushBest">0</b></span></div>
-    <div class="arcade-mobile"><button class="btn alt" id="rushLeft">← Links</button><button class="btn alt" id="rushJump">Springen ↑</button><button class="btn alt" id="rushRight">Rechts →</button></div>
-    <p class="arcade-help">Steuerung: ← / → oder A / D wechseln die Spur, ↑ / Leertaste springt. Am Handy die Buttons verwenden.</p>
+    <div class="arcade-head"><div><h3>🧱 Brick Breaker</h3><p>Zerstöre alle Blöcke, ohne den Ball fallen zu lassen.</p></div><span class="pill">Arcade</span></div>
+    <canvas id="brickCanvas" class="arcade-canvas" width="640" height="400" aria-label="Brick Breaker"></canvas>
+    <div class="arcade-controls"><button class="btn" id="brickStart">Start / Neustart</button><button class="btn alt" id="brickPause">Pause</button><span class="arcade-stat">Punkte: <b id="brickScore">0</b> · Leben: <b id="brickLives">3</b></span></div>
+    <div class="arcade-mobile"><button class="btn alt" id="brickLeft">← Links</button><button class="btn alt" id="brickRight">Rechts →</button></div>
+    <p class="arcade-help">Pfeiltasten / A und D oder bewege den Mauszeiger über das Spielfeld. Am Handy die Buttons verwenden.</p>
+  </article>
+  <article class="arcade-card">
+    <div class="arcade-head"><div><h3>🧠 Memory Match</h3><p>Finde alle Paare mit möglichst wenigen Zügen.</p></div><span class="pill">Denkspiel</span></div>
+    <div id="memoryBoard" class="memory-board" aria-label="Memory Spielfeld"></div>
+    <div class="arcade-controls"><button class="btn" id="memoryRestart">Neues Spiel</button><span class="arcade-stat">Züge: <b id="memoryMoves">0</b> · Paare: <b id="memoryPairs">0</b>/8</span></div>
+    <div class="result" id="memoryMessage">Zwei Karten aufdecken und ein Paar finden.</div>
+    <p class="arcade-help">Merke dir die Symbole. Gleiche Karten bleiben offen, unterschiedliche drehen sich wieder um.</p>
   </article>
 </section>
 
@@ -306,100 +328,89 @@ document.getElementById('captionVoteOne').onclick=()=>{dqScores[0]++;document.ge
 document.getElementById('captionVoteTwo').onclick=()=>{dqScores[1]++;document.getElementById('scoreTwo').textContent=dqScores[1];document.getElementById('captionResult').textContent='Punkt für '+(document.getElementById('playerTwo').value.trim()||'Team 2')+'.';};
 
 
-// ---------------- Arcade: 2D Azubi Runner ----------------
+
+// ---------------- Random video feed ----------------
 (()=>{
- const c=document.getElementById('runnerCanvas'),ctx=c.getContext('2d');
- const scoreEl=document.getElementById('runnerScore'),bestEl=document.getElementById('runnerBest');
- let running=false,paused=false,over=false,last=0,spawn=0,score=0,speed=330,obstacles=[],coffee=[],dust=[];
- const floor=408,player={x:130,y:floor-66,w:48,h:66,vy:0,ground:true,duck:false};
- let best=0;try{best=Number(localStorage.getItem('azubiRunnerBest')||0)}catch(e){} bestEl.textContent=best;
- function reset(){score=0;speed=330;spawn=0;obstacles=[];coffee=[];dust=[];player.y=floor-player.h;player.vy=0;player.ground=true;player.duck=false;over=false;paused=false;scoreEl.textContent='0';}
- function jump(){if(!running){start();return}if(over){start();return}if(player.ground&&!paused){player.vy=-700;player.ground=false;}}
- function start(){reset();running=true;last=performance.now();requestAnimationFrame(loop)}
- function rect(x,y,w,h,col){ctx.fillStyle=col;ctx.fillRect(x,y,w,h)}
- function draw(t){
-  const g=ctx.createLinearGradient(0,0,0,500);g.addColorStop(0,'#17172e');g.addColorStop(1,'#25233d');ctx.fillStyle=g;ctx.fillRect(0,0,800,500);
-  // windows and skyline
-  for(let i=0;i<7;i++){rect(i*130+20,65,68,105,'#252d4b');for(let j=0;j<3;j++)rect(i*130+29+j*18,78,9,13,'#7e8cff55')}
-  rect(0,floor,800,92,'#20202e');rect(0,floor,800,5,'#d9ff65');
-  for(let x=-(t*.22%80);x<820;x+=80)rect(x,floor+45,42,4,'#ffffff22');
-  // coffee collectibles
-  coffee.forEach(o=>{ctx.font='32px system-ui';ctx.fillText('☕',o.x,o.y)});
-  obstacles.forEach(o=>{if(o.type==='box'){rect(o.x,o.y,o.w,o.h,'#a56b4d');rect(o.x+5,o.y+7,o.w-10,7,'#e7b28b');rect(o.x+o.w/2-3,o.y,6,o.h,'#6e473b')}else{rect(o.x,o.y,o.w,o.h,'#7e8cff');rect(o.x+6,o.y+6,o.w-12,8,'#b8c1ff');rect(o.x+6,o.y+o.h-10,o.w-12,4,'#343c79') }});
-  // player
-  const ph=player.duck&&player.ground?36:66,py=player.duck&&player.ground?floor-ph:player.y;
-  rect(player.x+5,py+9,player.w-10,ph-8,'#d9ff65');rect(player.x+10,py+18,player.w-20,15,'#20202e');rect(player.x+30,py+20,5,5,'#fff');
-  rect(player.x+3,py+ph-4,15,4,'#ff58c8');rect(player.x+28,py+ph-4,15,4,'#ff58c8');
-  ctx.fillStyle='#f6f4ff';ctx.font='bold 18px system-ui';ctx.fillText('PAUSE / RUN',22,32);
-  if(!running||over||paused){ctx.fillStyle='#050611bb';ctx.fillRect(0,0,800,500);ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='bold 34px system-ui';ctx.fillText(over?'Game Over':paused?'Pausiert':'AZUBI RUNNER',400,220);ctx.font='18px system-ui';ctx.fillStyle='#d9ff65';ctx.fillText(over?'Start drücken und neuen Highscore holen':paused?'Pause drücken zum Weiterspielen':'Drück „Spiel starten“ oder Leertaste',400,260);ctx.textAlign='left'}
+ const videos=[
+  {id:'-yUSPEGcOQE',title:'POV: ID-Karte vergessen',tag:'Office Comedy',desc:'Ein kurzer Clip über den ganz normalen Büro-Morgen.'},
+  {id:'Cy2FofKzvOU',title:'Terminator trifft Büroalltag',tag:'Comedy Short',desc:'Ein Comedy-Short mit Sci-Fi- und Büro-Vibe.'}
+ ];
+ let current=-1,auto=false,autoTimer=null;
+ const frame=document.getElementById('randomVideoFrame');
+ function loadVideo(next=true){
+   let index;
+   if(videos.length<2) index=0;
+   else {index=Math.floor(Math.random()*videos.length);if(next&&index===current)index=(index+1)%videos.length;}
+   current=index;const v=videos[current];
+   frame.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(v.id)+'?playsinline=1&rel=0';
+   document.getElementById('randomVideoTitle').textContent=v.title;
+   document.getElementById('randomVideoTag').textContent=v.tag;
+   document.getElementById('randomVideoDescription').textContent=v.desc;
  }
- function loop(now){
-  if(!running)return;const dt=Math.min((now-last)/1000,.04);last=now;
-  if(!paused&&!over){
-   score+=dt*10;speed+=dt*4;spawn-=dt;
-   if(spawn<=0){let type=Math.random()<.72?'box':'cabinet';obstacles.push({x:830,y:type==='box'?floor-48:floor-85,w:type==='box'?42:54,h:type==='box'?48:85,type});spawn=Math.max(.65,1.4-Math.min(score/1000,.55))+Math.random()*.65;
-    if(Math.random()<.8)coffee.push({x:900,y:floor-95-Math.random()*80})}
-   obstacles.forEach(o=>o.x-=speed*dt);coffee.forEach(o=>o.x-=speed*dt);
-   obstacles=obstacles.filter(o=>o.x+o.w>0);coffee=coffee.filter(o=>o.x>-30);
-   player.vy+=1700*dt;player.y+=player.vy*dt;if(player.y>=floor-player.h){player.y=floor-player.h;player.vy=0;player.ground=true}
-   const ph=player.duck&&player.ground?36:66,py=player.duck&&player.ground?floor-ph:player.y;
-   for(const o of obstacles){if(player.x+player.w-7>o.x&&player.x+8<o.x+o.w&&py+ph-5>o.y+5&&py+7<o.y+o.h){over=true;running=false;break}}
-   coffee=coffee.filter(o=>{if(player.x+player.w>o.x&&player.x<o.x+30&&Math.abs((player.y+20)-o.y)<70){score+=25;return false}return true});
-   scoreEl.textContent=Math.floor(score);if(Math.floor(score)>best){best=Math.floor(score);bestEl.textContent=best;try{localStorage.setItem('azubiRunnerBest',best)}catch(e){}}
-  }
-  draw(now);if(running)requestAnimationFrame(loop);
- }
- document.getElementById('runnerStart').onclick=start;
- document.getElementById('runnerPause').onclick=()=>{if(!running&&over)return;if(!running)return;paused=!paused;};
- document.getElementById('runnerJump').onclick=jump;
- document.getElementById('runnerDuck').onpointerdown=()=>player.duck=true;
- document.getElementById('runnerDuck').onpointerup=()=>player.duck=false;
- document.getElementById('runnerDuck').onpointerleave=()=>player.duck=false;
- window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown',' '].includes(e.key)&&document.activeElement.tagName!=='INPUT'&&document.activeElement.tagName!=='TEXTAREA'){e.preventDefault();if(e.repeat)return;if(e.key==='ArrowDown')player.duck=true;else jump()}});
- window.addEventListener('keyup',e=>{if(e.key==='ArrowDown')player.duck=false});
- draw(0);
+ document.getElementById('nextRandomVideo').onclick=()=>loadVideo(true);
+ document.getElementById('openRandomVideo').onclick=()=>{if(current>=0)window.open('https://www.youtube.com/shorts/'+videos[current].id,'_blank','noopener');};
+ document.getElementById('randomVideoSearch').onclick=()=>window.open('https://www.youtube.com/results?search_query=funny+office+memes+shorts','_blank','noopener');
+ document.getElementById('toggleAutoplay').onclick=()=>{
+  auto=!auto;const b=document.getElementById('toggleAutoplay');b.textContent='Auto-Wechsel: '+(auto?'An':'Aus');
+  if(auto){autoTimer=setInterval(()=>loadVideo(true),45000);}else{clearInterval(autoTimer);autoTimer=null;}
+ };
+ loadVideo(false);
 })();
 
-// ---------------- Arcade: pseudo-3D Office Rush ----------------
+// ---------------- Neon Snake ----------------
 (()=>{
- const c=document.getElementById('rushCanvas'),ctx=c.getContext('2d');
- let running=false,paused=false,over=false,last=0,score=0,speed=0.45,spawn=0,lane=1,jumping=0,items=[],best=0;
- const scoreEl=document.getElementById('rushScore'),bestEl=document.getElementById('rushBest');
- try{best=Number(localStorage.getItem('officeRushBest')||0)}catch(e){}bestEl.textContent=best;
- function reset(){score=0;speed=.45;spawn=.4;lane=1;jumping=0;items=[];over=false;paused=false;scoreEl.textContent='0'}
- function start(){reset();running=true;last=performance.now();requestAnimationFrame(loop)}
- function move(n){lane=Math.max(0,Math.min(2,lane+n))}
- function jump(){if(!running){start();return}if(!over&&!paused)jumping=1}
- function project(z){return {y:120+Math.pow(z,1.65)*380,x:400+(z*260),w:40+z*450}}
- function draw(now){
-  const sky=ctx.createLinearGradient(0,0,0,500);sky.addColorStop(0,'#141a37');sky.addColorStop(1,'#3b3151');ctx.fillStyle=sky;ctx.fillRect(0,0,800,500);
-  // distant office skyline
-  for(let i=0;i<10;i++){let x=i*92-12;let h=55+(i*37%80);ctx.fillStyle=i%2?'#252c4b':'#20243e';ctx.fillRect(x,145-h,68,h);for(let y=155-h;y<140;y+=17)for(let xx=x+9;xx<x+60;xx+=17){ctx.fillStyle='#d9ff6522';ctx.fillRect(xx,y,7,7)}}
-  // road trapezoid
-  ctx.fillStyle='#171923';ctx.beginPath();ctx.moveTo(310,125);ctx.lineTo(490,125);ctx.lineTo(790,500);ctx.lineTo(10,500);ctx.closePath();ctx.fill();
-  ctx.strokeStyle='#d9ff6588';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(310,125);ctx.lineTo(10,500);ctx.moveTo(490,125);ctx.lineTo(790,500);ctx.stroke();
-  for(let i=1;i<=2;i++){ctx.strokeStyle='#ffffff55';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(400+(i-1)*60,125);ctx.lineTo(400+(i-1)*60-200,500);ctx.stroke()}
-  // moving lane markers
-  for(let k=0;k<9;k++){let z=((k/9+(now/1500*speed)%1)%1);let y=130+z*z*370;let wid=2+z*6;ctx.fillStyle='#ffffff88';ctx.fillRect(400-wid/2,y,wid,8+z*24)}
-  items.forEach(o=>{const p=project(o.z),x=400+(o.lane-1)*p.w*.43;const size=16+o.z*72;ctx.save();ctx.translate(x,p.y);ctx.fillStyle=o.type==='coffee'?'#d9ff65':o.type==='cart'?'#ff58c8':'#7e8cff';ctx.fillRect(-size/2,-size,size,size);ctx.fillStyle='#141423';ctx.fillRect(-size/2+size*.18,-size*.75,size*.64,size*.15);ctx.fillStyle='#fff';ctx.font=`${Math.max(10,size*.48)}px system-ui`;ctx.textAlign='center';ctx.fillText(o.type==='coffee'?'☕':o.type==='cart'?'▦':'!',0,-size*.22);ctx.restore()});
-  // player perspective character
-  const px=400+(lane-1)*95,py=415-(jumping>0?Math.sin(jumping*Math.PI)*100:0);
-  ctx.fillStyle='#d9ff65';ctx.fillRect(px-23,py-58,46,58);ctx.fillStyle='#1a1b2a';ctx.fillRect(px-14,py-45,28,15);ctx.fillStyle='#fff';ctx.fillRect(px+5,py-42,4,4);ctx.fillStyle='#ff58c8';ctx.fillRect(px-25,py-7,18,7);ctx.fillRect(px+7,py-7,18,7);
-  ctx.fillStyle='#fff';ctx.font='bold 18px system-ui';ctx.fillText('OFFICE RUSH',22,32);
-  if(!running||paused||over){ctx.fillStyle='#050611bb';ctx.fillRect(0,0,800,500);ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='bold 32px system-ui';ctx.fillText(over?'Crash!':paused?'Pausiert':'OFFICE RUSH',400,220);ctx.font='18px system-ui';ctx.fillStyle='#d9ff65';ctx.fillText(over?'Neustart und neue Bestzeit?':paused?'Pause drücken zum Weiterspielen':'Wechsle die Spur und weich aus!',400,260);ctx.textAlign='left'}
+ const c=document.getElementById('snakeCanvas'),ctx=c.getContext('2d'),cols=20,rows=14,cell=32;
+ let snake,dir,nextDir,food,score,running=false,paused=false,dead=false,timer=null;
+ const scoreEl=document.getElementById('snakeScore'),bestEl=document.getElementById('snakeBest');
+ let best=0;try{best=Number(localStorage.getItem('neonSnakeBest')||0)}catch(e){}bestEl.textContent=best;
+ function randFood(){let f;do{f={x:Math.floor(Math.random()*cols),y:Math.floor(Math.random()*rows)}}while(snake.some(p=>p.x===f.x&&p.y===f.y));return f}
+ function reset(){snake=[{x:7,y:7},{x:6,y:7},{x:5,y:7}];dir={x:1,y:0};nextDir={x:1,y:0};food=randFood();score=0;dead=false;paused=false;running=true;scoreEl.textContent='0';draw();if(timer)clearInterval(timer);timer=setInterval(tick,115)}
+ function draw(){
+  ctx.fillStyle='#090b16';ctx.fillRect(0,0,c.width,c.height);
+  ctx.strokeStyle='#ffffff0a';ctx.lineWidth=1;for(let x=0;x<=cols;x++){ctx.beginPath();ctx.moveTo(x*cell,0);ctx.lineTo(x*cell,c.height);ctx.stroke()}for(let y=0;y<=rows;y++){ctx.beginPath();ctx.moveTo(0,y*cell);ctx.lineTo(c.width,y*cell);ctx.stroke()}
+  ctx.fillStyle='#ff58c8';ctx.beginPath();ctx.arc(food.x*cell+cell/2,food.y*cell+cell/2,cell*.34,0,Math.PI*2);ctx.fill();
+  snake.forEach((p,i)=>{ctx.fillStyle=i===0?'#d9ff65':'#7e8cff';ctx.beginPath();ctx.roundRect(p.x*cell+2,p.y*cell+2,cell-4,cell-4,7);ctx.fill();});
+  if(!running||paused||dead){ctx.fillStyle='#070814cc';ctx.fillRect(0,0,c.width,c.height);ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='bold 30px system-ui';ctx.fillText(dead?'Game Over':paused?'Pausiert':'NEON SNAKE',c.width/2,c.height/2-8);ctx.fillStyle='#d9ff65';ctx.font='16px system-ui';ctx.fillText(dead?'Start / Neustart drücken':paused?'Pause drücken zum Weiterspielen':'Starte und sammle die pinken Punkte',c.width/2,c.height/2+24);ctx.textAlign='left'}
  }
- function loop(now){if(!running)return;let dt=Math.min((now-last)/1000,.04);last=now;
-  if(!paused&&!over){score+=dt*12;speed=Math.min(.95,speed+dt*.006);spawn-=dt;
-   if(spawn<=0){const ln=Math.floor(Math.random()*3);items.push({lane:ln,z:0,type:Math.random()<.2?'coffee':Math.random()<.5?'cart':'box'});spawn=Math.max(.5,1.1-score/1500)+Math.random()*.35}
-   items.forEach(o=>o.z+=dt*speed);items=items.filter(o=>o.z<1.1);
-   if(jumping>0)jumping+=dt*1.9;if(jumping>=1){jumping=0}
-   for(const o of items){if(o.z>.91&&o.z<1.02&&o.lane===lane){if(o.type==='coffee'){score+=35;o.z=1.2}else if(jumping===0){over=true;running=false;break}}}
-   scoreEl.textContent=Math.floor(score);if(Math.floor(score)>best){best=Math.floor(score);bestEl.textContent=best;try{localStorage.setItem('officeRushBest',best)}catch(e){}}
-  }draw(now);if(running)requestAnimationFrame(loop)}
- document.getElementById('rushStart').onclick=start;document.getElementById('rushPause').onclick=()=>{if(running)paused=!paused};
- document.getElementById('rushLeft').onclick=()=>move(-1);document.getElementById('rushRight').onclick=()=>move(1);document.getElementById('rushJump').onclick=jump;
- window.addEventListener('keydown',e=>{if(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA')return;if(['ArrowLeft','ArrowRight','ArrowUp',' '].includes(e.key)){e.preventDefault();if(e.repeat)return;if(e.key==='ArrowLeft'||e.key.toLowerCase()==='a')move(-1);else if(e.key==='ArrowRight'||e.key.toLowerCase()==='d')move(1);else jump()}else if(e.key.toLowerCase()==='a')move(-1);else if(e.key.toLowerCase()==='d')move(1)});
- draw(0);
+ function tick(){if(!running||paused||dead)return;dir=nextDir;const h={x:snake[0].x+dir.x,y:snake[0].y+dir.y};if(h.x<0||h.x>=cols||h.y<0||h.y>=rows||snake.some((p,i)=>i>0&&p.x===h.x&&p.y===h.y)){dead=true;running=false;clearInterval(timer);draw();return}snake.unshift(h);if(h.x===food.x&&h.y===food.y){score+=10;scoreEl.textContent=score;food=randFood();if(score>best){best=score;bestEl.textContent=best;try{localStorage.setItem('neonSnakeBest',best)}catch(e){}}}else snake.pop();draw()}
+ function setDir(x,y){if(x===-dir.x&&y===-dir.y)return;nextDir={x,y};}
+ document.getElementById('snakeStart').onclick=reset;
+ document.getElementById('snakePause').onclick=()=>{if(!running)return;paused=!paused;draw()};
+ document.getElementById('snakeUp').onclick=()=>setDir(0,-1);document.getElementById('snakeDown').onclick=()=>setDir(0,1);document.getElementById('snakeLeft').onclick=()=>setDir(-1,0);document.getElementById('snakeRight').onclick=()=>setDir(1,0);
+ window.addEventListener('keydown',e=>{if(document.activeElement.matches('input,textarea'))return;const k=e.key.toLowerCase();const map={arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1],arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0]};if(map[k]){e.preventDefault();setDir(...map[k])}});
+ draw();
+})();
+
+// ---------------- Brick Breaker ----------------
+(()=>{
+ const c=document.getElementById('brickCanvas'),ctx=c.getContext('2d');
+ let paddle={x:270,w:100,h:12},ball={x:320,y:330,vx:210,vy:-230,r:8},bricks=[],score=0,lives=3,running=false,paused=false,over=false,last=0,raf=null;
+ const scoreEl=document.getElementById('brickScore'),livesEl=document.getElementById('brickLives');
+ function reset(){paddle.x=(c.width-paddle.w)/2;ball={x:c.width/2,y:c.height-50,vx:210,vy:-230,r:8};bricks=[];for(let r=0;r<5;r++)for(let col=0;col<9;col++)bricks.push({x:25+col*66,y:35+r*28,w:58,h:17,alive:true,row:r});score=0;lives=3;running=false;paused=false;over=false;scoreEl.textContent=score;livesEl.textContent=lives;draw()}
+ function start(){if(over||bricks.length===0)reset();running=true;paused=false;last=performance.now();if(raf)cancelAnimationFrame(raf);raf=requestAnimationFrame(loop)}
+ function draw(){ctx.fillStyle='#090b16';ctx.fillRect(0,0,c.width,c.height);bricks.forEach(b=>{if(!b.alive)return;ctx.fillStyle=['#ff58c8','#7e8cff','#d9ff65','#ffad5c','#55d6be'][b.row];ctx.beginPath();ctx.roundRect(b.x,b.y,b.w,b.h,4);ctx.fill()});ctx.fillStyle='#f6f4ff';ctx.beginPath();ctx.roundRect(paddle.x,c.height-28,paddle.w,paddle.h,6);ctx.fill();ctx.fillStyle='#d9ff65';ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);ctx.fill();if(!running||paused||over){ctx.fillStyle='#070814cc';ctx.fillRect(0,0,c.width,c.height);ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='bold 29px system-ui';ctx.fillText(over?(lives===0?'Game Over':'Gewonnen!'):paused?'Pausiert':'BRICK BREAKER',c.width/2,c.height/2-8);ctx.fillStyle='#d9ff65';ctx.font='16px system-ui';ctx.fillText(over?'Start / Neustart für eine neue Runde':paused?'Pause drücken zum Weiterspielen':'Start drücken und den Ball halten',c.width/2,c.height/2+24);ctx.textAlign='left'}}
+ function loop(now){if(!running)return;const dt=Math.min((now-last)/1000,.025);last=now;if(!paused&&!over){ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;if(ball.x<ball.r||ball.x>c.width-ball.r)ball.vx*=-1;if(ball.y<ball.r)ball.vy=Math.abs(ball.vy);if(ball.y>c.height-36&&ball.y<c.height-20&&ball.x>paddle.x&&ball.x<paddle.x+paddle.w&&ball.vy>0){ball.vy=-Math.abs(ball.vy);ball.vx+=((ball.x-(paddle.x+paddle.w/2))/(paddle.w/2))*75}
+  bricks.forEach(b=>{if(!b.alive)return;if(ball.x+ball.r>b.x&&ball.x-ball.r<b.x+b.w&&ball.y+ball.r>b.y&&ball.y-ball.r<b.y+b.h){b.alive=false;ball.vy*=-1;score+=10;scoreEl.textContent=score}});
+  if(ball.y>c.height+10){lives--;livesEl.textContent=lives;if(lives<=0){over=true;running=false}else{ball={x:paddle.x+paddle.w/2,y:c.height-50,vx:(Math.random()>.5?1:-1)*210,vy:-230}}}
+  if(bricks.every(b=>!b.alive)){over=true;running=false}
+ }draw();if(running)raf=requestAnimationFrame(loop)}
+ function movePaddle(x){paddle.x=Math.max(0,Math.min(c.width-paddle.w,x-paddle.w/2));if(!running)draw()}
+ c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect();movePaddle((e.clientX-r.left)/r.width*c.width)});
+ c.addEventListener('touchmove',e=>{e.preventDefault();const r=c.getBoundingClientRect();movePaddle((e.touches[0].clientX-r.left)/r.width*c.width)},{passive:false});
+ document.getElementById('brickStart').onclick=start;document.getElementById('brickPause').onclick=()=>{if(running){paused=!paused;draw()}};
+ document.getElementById('brickLeft').onclick=()=>{paddle.x=Math.max(0,paddle.x-45);draw()};document.getElementById('brickRight').onclick=()=>{paddle.x=Math.min(c.width-paddle.w,paddle.x+45);draw()};
+ window.addEventListener('keydown',e=>{if(document.activeElement.matches('input,textarea'))return;const k=e.key.toLowerCase();if(['arrowleft','arrowright','a','d'].includes(k)){e.preventDefault();paddle.x=Math.max(0,Math.min(c.width-paddle.w,paddle.x+(k==='arrowleft'||k==='a'?-35:35)));if(!running)draw()}});
+ reset();
+})();
+
+// ---------------- Memory Match ----------------
+(()=>{
+ const symbols=['☕','📎','💾','🖨️','📁','🧠','🕒','📧'];let deck=[],open=[],matched=new Set(),moves=0,locked=false;
+ const board=document.getElementById('memoryBoard'),movesEl=document.getElementById('memoryMoves'),pairsEl=document.getElementById('memoryPairs'),msg=document.getElementById('memoryMessage');
+ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+ function start(){deck=shuffle([...symbols,...symbols]);open=[];matched=new Set();moves=0;locked=false;movesEl.textContent='0';pairsEl.textContent='0';msg.textContent='Zwei Karten aufdecken und ein Paar finden.';board.innerHTML='';deck.forEach((sym,i)=>{const b=document.createElement('button');b.className='memory-card';b.type='button';b.textContent='?';b.setAttribute('aria-label','Verdeckte Karte');b.onclick=()=>flip(i,b);board.appendChild(b)})}
+ function flip(i,b){if(locked||matched.has(i)||open.includes(i))return;b.textContent=deck[i];b.classList.add('flipped');b.setAttribute('aria-label',deck[i]);open.push(i);if(open.length===2){moves++;movesEl.textContent=moves;const [a,d]=open;if(deck[a]===deck[d]){matched.add(a);matched.add(d);[a,d].forEach(k=>{board.children[k].classList.add('matched');board.children[k].classList.remove('flipped')});pairsEl.textContent=matched.size/2;open=[];if(matched.size===deck.length)msg.textContent='Alles gefunden in '+moves+' Zügen. Sauber!'}else{locked=true;setTimeout(()=>{[a,d].forEach(k=>{const el=board.children[k];el.textContent='?';el.classList.remove('flipped');el.setAttribute('aria-label','Verdeckte Karte')});open=[];locked=false},750)}}}
+ document.getElementById('memoryRestart').onclick=start;start();
 })();
 
 </script>
